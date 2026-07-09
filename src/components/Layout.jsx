@@ -1,47 +1,32 @@
-import { NavLink, Outlet } from 'react-router-dom'
+import { Outlet } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
-
-const NAV_BY_DEPT = {
-  design:     [['/', 'Dashboard'], ['/intake', 'New Lead'], ['/calendar', 'Calendar']],
-  production: [['/', 'Dashboard'], ['/production', 'Production Board']],
-  delivery:   [['/', 'Dashboard'], ['/delivery', 'Delivery Board']],
-  admin:      [['/', 'Dashboard'], ['/intake', 'New Lead'], ['/production', 'Production'], ['/delivery', 'Delivery'], ['/inventory', 'Inventory'], ['/invoices', 'Invoices'], ['/calendar', 'Calendar']],
-}
+import BottomNav from './BottomNav'
 
 export default function Layout() {
   const { profile, signOut } = useAuth()
-  const links = NAV_BY_DEPT[profile?.department] || []
 
   return (
-    <div className="min-h-screen bg-steel-950 text-steel-50">
-      <header className="border-b border-steel-800 bg-steel-900">
-        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <span className="font-display text-2xl font-semibold tracking-wide">CUBIT <span className="text-signal">FLOW</span></span>
-            <span className="text-xs text-steel-400 uppercase tracking-widest">{profile?.department}</span>
+    <div className="min-h-screen bg-slate-950 text-slate-50">
+      <header
+        className="border-b border-slate-800 bg-slate-900 sticky top-0 z-40"
+        style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
+      >
+        <div className="px-4 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="font-bold text-xl tracking-wide">CUBIT <span className="text-orange-500">FLOW</span></span>
           </div>
-          <nav className="flex items-center gap-1">
-            {links.map(([to, label]) => (
-              <NavLink
-                key={to}
-                to={to}
-                end={to === '/'}
-                className={({ isActive }) =>
-                  `px-3 py-2 text-sm rounded font-medium ${isActive ? 'bg-signal text-white' : 'text-steel-200 hover:bg-steel-800'}`
-                }
-              >
-                {label}
-              </NavLink>
-            ))}
-            <button onClick={signOut} className="ml-2 px-3 py-2 text-sm rounded text-steel-400 hover:text-steel-100">
+          <div className="flex items-center gap-3">
+            <span className="text-xs text-slate-500 uppercase tracking-widest">{profile?.department}</span>
+            <button onClick={signOut} className="text-sm text-slate-400 min-h-[44px] px-2">
               Sign out
             </button>
-          </nav>
+          </div>
         </div>
       </header>
-      <main className="max-w-6xl mx-auto px-4 py-6">
+      <main className="px-4 py-4 pb-24">
         <Outlet />
       </main>
+      <BottomNav />
     </div>
   )
 }
