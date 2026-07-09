@@ -138,6 +138,15 @@ export default function ProjectDetail() {
           ))}
         </div>
       </Section>
+      {['design', 'admin'].includes(profile.department) && project.stage === 'new_lead' && (
+        <Section title="Start Design">
+          <p className="text-sm text-slate-400 mb-3">Once the customer arrives and you begin filling out the spec sheet, move this lead into Design.</p>
+          <button onClick={() => transitionTo('design')} className="px-3 py-2 text-sm rounded bg-orange-600 text-white font-medium">
+            Start Design Meeting →
+          </button>
+        </Section>
+      )}
+
 
       {/* DEPOSIT + SIGNING — design dept, while in design/deposit_pending */}
       {['design', 'admin'].includes(profile.department) && ['design', 'deposit_pending'].includes(project.stage) && (
