@@ -140,7 +140,7 @@ export default function ProjectDetail() {
       </Section>
 
       {/* DEPOSIT + SIGNING — design dept, while in design/deposit_pending */}
-      {profile.department === 'design' && ['design', 'deposit_pending'].includes(project.stage) && (
+      {['design', 'admin'].includes(profile.department) && ['design', 'deposit_pending'].includes(project.stage) && (
         <Section title="Deposit & Sign-Off (25%)">
           <div className="flex items-end gap-3 mb-3">
             <div>
