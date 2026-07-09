@@ -37,7 +37,7 @@ export default function ProjectDetail() {
   if (loading || !project) return <p className="text-steel-400">Loading…</p>
 
   const locked = isLocked(project)
-  const canEditSpec = profile.department === 'design' && !locked
+  const canEditSpec = ['design', 'admin'].includes(profile.department) && !locked
   const canActProduction = profile.department === 'production' && ['in_production', 'production_complete'].includes(project.stage)
   const canActDelivery = profile.department === 'delivery' && ['delivery_pending', 'delivery_scheduled', 'delivered_installed'].includes(project.stage)
 
