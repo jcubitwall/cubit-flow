@@ -44,7 +44,8 @@ const NAV_BY_DEPT = {
   design:     [['/', 'Home', 'home'], ['/intake', 'New Lead', 'plus'], ['/calendar', 'Calendar', 'calendar']],
   production: [['/', 'Home', 'home'], ['/production', 'Board', 'hammer']],
   delivery:   [['/', 'Home', 'home'], ['/delivery', 'Board', 'truck']],
-  admin:      [['/', 'Home', 'home'], ['/production', 'Prod', 'hammer'], ['/delivery', 'Deliv', 'truck'], ['/inventory', 'Stock', 'box'], ['/invoices', 'Invoices', 'receipt']],
+  admin:    [['/', 'Home', 'home'], ['/intake', 'New Lead', 'plus'], ['/production', 'Prod', 'hammer'], ['/delivery', 'Deliv', 'truck'], ['/inventory', 'Stock', 'box'], ['/invoices', 'Invoices', 'receipt']],
+
 }
 
 export default function BottomNav() {
