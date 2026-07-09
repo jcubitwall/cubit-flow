@@ -23,7 +23,7 @@ function Gate({ children, allow }) {
 export default function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
+      <BrowserRouter basename="/cubit-flow">
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route element={<Gate><Layout /></Gate>}>
