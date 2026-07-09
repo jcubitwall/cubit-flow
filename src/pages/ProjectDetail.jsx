@@ -177,7 +177,7 @@ export default function ProjectDetail() {
       )}
 
       {/* CHANGE ORDER while production_pending */}
-      {profile.department === 'design' && project.stage === 'production_pending' && (
+      {['design', 'admin'].includes(profile.department) && project.stage === 'production_pending' && (
         <Section title="Change Order">
           <p className="text-sm text-steel-400 mb-2">Customer can still request changes. Edit the spec above, then both parties re-sign below.</p>
           {!showSignature && (
