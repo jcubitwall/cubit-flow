@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body, #root { height: 100%; }
+body { font-family: 'Inter', sans-serif; }
+h1, h2, h3, .font-display { font-family: 'Barlow Condensed', sans-serif; letter-spacing: 0.01em; }
+
+/* visible keyboard focus everywhere — shop tablets get used with styluses and keyboards both */
+:focus-visible {
+  outline: 2px solid #e0672a;
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
