@@ -1,9 +1,5 @@
 import { useRef, useState, useEffect } from 'react'
 
-/**
- * A simple canvas-based signature pad. Works with finger, stylus, or mouse.
- * Calls onSave(blob) with a PNG blob when the signer taps "Use this signature".
- */
 export default function SignaturePad({ label, onSave, onClear }) {
   const canvasRef = useRef(null)
   const drawing = useRef(false)
@@ -12,7 +8,6 @@ export default function SignaturePad({ label, onSave, onClear }) {
   useEffect(() => {
     const canvas = canvasRef.current
     const ctx = canvas.getContext('2d')
-    // Scale for device pixel ratio so it's crisp on retina / tablet screens
     const ratio = window.devicePixelRatio || 1
     canvas.width = canvas.offsetWidth * ratio
     canvas.height = canvas.offsetHeight * ratio
@@ -24,12 +19,12 @@ export default function SignaturePad({ label, onSave, onClear }) {
 
   function getPos(e) {
     const rect = canvasRef.current.getBoundingClientRect()
-    const point = e.touches ? e.touches[0] : e
-    return { x: point.clientX - rect.left, y: point.clientY - rect.top }
+    return { x: e.clientX - rect.left, y: e.clientY - rect.top }
   }
 
   function start(e) {
     e.preventDefault()
+    canvasRef.current.setPointerCapture(e.pointerId)
     drawing.current = true
     const { x, y } = getPos(e)
     const ctx = canvasRef.current.getContext('2d')
@@ -47,7 +42,9 @@ export default function SignaturePad({ label, onSave, onClear }) {
     setHasStroke(true)
   }
 
-  function end() { drawing.current = false }
+  function end(e) {
+    drawing.current = false
+  }
 
   function clear() {
     const canvas = canvasRef.current
@@ -62,19 +59,23 @@ export default function SignaturePad({ label, onSave, onClear }) {
   }
 
   return (
-    <div className="border border-steel-700 rounded-lg p-3 bg-white">
-      {label && <p className="text-sm text-steel-800 mb-2 font-medium">{label}</p>}
+    <div className="border border-slate-700 rounded-lg p-3 bg-white">
+      {label && <p className="text-sm text-slate-800 mb-2 font-medium">{label}</p>}
       <canvas
         ref={canvasRef}
-        className="w-full h-40 bg-steel-50 rounded touch-none border border-dashed border-steel-400"
-        onMouseDown={start} onMouseMove={move} onMouseUp={end} onMouseLeave={end}
-        onTouchStart={start} onTouchMove={move} onTouchEnd={end}
+        className="w-full h-40 bg-slate-50 rounded border border-dashed border-slate-400"
+        style={{ touchAction: 'none' }}
+        onPointerDown={start}
+        onPointerMove={move}
+        onPointerUp={end}
+        onPointerLeave={end}
+        onPointerCancel={end}
       />
       <div className="flex gap-2 mt-3">
         <button
           type="button"
           onClick={clear}
-          className="px-3 py-2 text-sm rounded border border-steel-400 text-steel-700 hover:bg-steel-50"
+          className="px-3 py-2 text-sm rounded border border-slate-400 text-slate-700 hover:bg-slate-50"
         >
           Clear
         </button>
@@ -82,7 +83,7 @@ export default function SignaturePad({ label, onSave, onClear }) {
           type="button"
           onClick={save}
           disabled={!hasStroke}
-          className="px-4 py-2 text-sm rounded bg-signal text-white font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:brightness-95"
+          className="px-4 py-2 text-sm rounded bg-orange-600 text-white font-medium disabled:opacity-40 disabled:cursor-not-allowed"
         >
           Use this signature
         </button>
