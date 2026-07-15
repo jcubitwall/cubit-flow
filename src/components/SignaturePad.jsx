@@ -17,16 +17,19 @@ export default function SignaturePad({ label, onSave, onClear }) {
     ctx.strokeStyle = '#12161c'
   }, [])
 
-  function getPos(e) {
+  function pointFromEvent(e) {
     const rect = canvasRef.current.getBoundingClientRect()
+    if (e.touches && e.touches.length) {
+      return { x: e.touches[0].clientX - rect.left, y: e.touches[0].clientY - rect.top }
+    }
     return { x: e.clientX - rect.left, y: e.clientY - rect.top }
   }
 
   function start(e) {
     e.preventDefault()
-    canvasRef.current.setPointerCapture(e.pointerId)
+    e.stopPropagation()
     drawing.current = true
-    const { x, y } = getPos(e)
+    const { x, y } = pointFromEvent(e)
     const ctx = canvasRef.current.getContext('2d')
     ctx.beginPath()
     ctx.moveTo(x, y)
@@ -35,7 +38,8 @@ export default function SignaturePad({ label, onSave, onClear }) {
   function move(e) {
     if (!drawing.current) return
     e.preventDefault()
-    const { x, y } = getPos(e)
+    e.stopPropagation()
+    const { x, y } = pointFromEvent(e)
     const ctx = canvasRef.current.getContext('2d')
     ctx.lineTo(x, y)
     ctx.stroke()
@@ -43,6 +47,7 @@ export default function SignaturePad({ label, onSave, onClear }) {
   }
 
   function end(e) {
+    if (e) { e.preventDefault(); e.stopPropagation() }
     drawing.current = false
   }
 
@@ -59,17 +64,26 @@ export default function SignaturePad({ label, onSave, onClear }) {
   }
 
   return (
-    <div className="border border-slate-700 rounded-lg p-3 bg-white">
+    <div className="border border-slate-700 rounded-lg p-3 bg-white" style={{ overscrollBehavior: 'contain' }}>
       {label && <p className="text-sm text-slate-800 mb-2 font-medium">{label}</p>}
       <canvas
         ref={canvasRef}
         className="w-full h-40 bg-slate-50 rounded border border-dashed border-slate-400"
-        style={{ touchAction: 'none' }}
-        onPointerDown={start}
-        onPointerMove={move}
-        onPointerUp={end}
-        onPointerLeave={end}
-        onPointerCancel={end}
+        style={{
+          touchAction: 'none',
+          WebkitUserSelect: 'none',
+          userSelect: 'none',
+          WebkitTouchCallout: 'none',
+          overscrollBehavior: 'contain',
+        }}
+        onTouchStart={start}
+        onTouchMove={move}
+        onTouchEnd={end}
+        onTouchCancel={end}
+        onMouseDown={start}
+        onMouseMove={move}
+        onMouseUp={end}
+        onMouseLeave={end}
       />
       <div className="flex gap-2 mt-3">
         <button
