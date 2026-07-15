@@ -15,41 +15,61 @@ export default function SignaturePad({ label, onSave, onClear }) {
     ctx.lineWidth = 2.5
     ctx.lineCap = 'round'
     ctx.strokeStyle = '#12161c'
-  }, [])
 
-  function pointFromEvent(e) {
-    const rect = canvasRef.current.getBoundingClientRect()
-    if (e.touches && e.touches.length) {
-      return { x: e.touches[0].clientX - rect.left, y: e.touches[0].clientY - rect.top }
+    function pointFromEvent(e) {
+      const rect = canvas.getBoundingClientRect()
+      if (e.touches && e.touches.length) {
+        return { x: e.touches[0].clientX - rect.left, y: e.touches[0].clientY - rect.top }
+      }
+      return { x: e.clientX - rect.left, y: e.clientY - rect.top }
     }
-    return { x: e.clientX - rect.left, y: e.clientY - rect.top }
-  }
 
-  function start(e) {
-    e.preventDefault()
-    e.stopPropagation()
-    drawing.current = true
-    const { x, y } = pointFromEvent(e)
-    const ctx = canvasRef.current.getContext('2d')
-    ctx.beginPath()
-    ctx.moveTo(x, y)
-  }
+    function start(e) {
+      e.preventDefault()
+      drawing.current = true
+      const { x, y } = pointFromEvent(e)
+      ctx.beginPath()
+      ctx.moveTo(x, y)
+    }
 
-  function move(e) {
-    if (!drawing.current) return
-    e.preventDefault()
-    e.stopPropagation()
-    const { x, y } = pointFromEvent(e)
-    const ctx = canvasRef.current.getContext('2d')
-    ctx.lineTo(x, y)
-    ctx.stroke()
-    setHasStroke(true)
-  }
+    function move(e) {
+      if (!drawing.current) return
+      e.preventDefault()
+      const { x, y } = pointFromEvent(e)
+      ctx.lineTo(x, y)
+      ctx.stroke()
+      setHasStroke(true)
+    }
 
-  function end(e) {
-    if (e) { e.preventDefault(); e.stopPropagation() }
-    drawing.current = false
-  }
+    function end(e) {
+      if (e) e.preventDefault()
+      drawing.current = false
+    }
+
+    // Attach as non-passive listeners directly — this is the key fix.
+    // React's synthetic touch events default to passive, which silently
+    // ignores preventDefault() on iOS Safari and lets the page steal
+    // the gesture mid-stroke.
+    canvas.addEventListener('touchstart', start, { passive: false })
+    canvas.addEventListener('touchmove', move, { passive: false })
+    canvas.addEventListener('touchend', end, { passive: false })
+    canvas.addEventListener('touchcancel', end, { passive: false })
+    canvas.addEventListener('mousedown', start)
+    canvas.addEventListener('mousemove', move)
+    canvas.addEventListener('mouseup', end)
+    canvas.addEventListener('mouseleave', end)
+
+    return () => {
+      canvas.removeEventListener('touchstart', start)
+      canvas.removeEventListener('touchmove', move)
+      canvas.removeEventListener('touchend', end)
+      canvas.removeEventListener('touchcancel', end)
+      canvas.removeEventListener('mousedown', start)
+      canvas.removeEventListener('mousemove', move)
+      canvas.removeEventListener('mouseup', end)
+      canvas.removeEventListener('mouseleave', end)
+    }
+  }, [])
 
   function clear() {
     const canvas = canvasRef.current
@@ -64,26 +84,12 @@ export default function SignaturePad({ label, onSave, onClear }) {
   }
 
   return (
-    <div className="border border-slate-700 rounded-lg p-3 bg-white" style={{ overscrollBehavior: 'contain' }}>
+    <div className="border border-slate-700 rounded-lg p-3 bg-white">
       {label && <p className="text-sm text-slate-800 mb-2 font-medium">{label}</p>}
       <canvas
         ref={canvasRef}
         className="w-full h-40 bg-slate-50 rounded border border-dashed border-slate-400"
-        style={{
-          touchAction: 'none',
-          WebkitUserSelect: 'none',
-          userSelect: 'none',
-          WebkitTouchCallout: 'none',
-          overscrollBehavior: 'contain',
-        }}
-        onTouchStart={start}
-        onTouchMove={move}
-        onTouchEnd={end}
-        onTouchCancel={end}
-        onMouseDown={start}
-        onMouseMove={move}
-        onMouseUp={end}
-        onMouseLeave={end}
+        style={{ touchAction: 'none', WebkitUserSelect: 'none', userSelect: 'none' }}
       />
       <div className="flex gap-2 mt-3">
         <button
