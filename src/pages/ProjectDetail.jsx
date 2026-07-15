@@ -168,7 +168,7 @@ export default function ProjectDetail() {
             </div>
           </div>
           {!project.deposit_paid_at ? (
-            <button onClick={() => recordPayment('deposit_paid_at')} className="px-3 py-2 text-sm rounded bg-wait text-steel-950 font-medium">
+       <button onClick={() => transitionTo('deposit_pending', { deposit_paid_at: new Date().toISOString() })} className="px-3 py-2 text-sm rounded bg-wait text-steel-950 font-medium">
               Mark deposit as paid
             </button>
           ) : (
